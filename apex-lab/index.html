@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Apex Lab — Race Engineering Simulator</title>
+  <meta name="description" content="Interactive race engineering telemetry, setup sensitivity, and Monte Carlo strategy lab.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="shell">
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">Applied mathematics × motorsport</div>
+      <h1 class="title">APEX <span>LAB</span></h1>
+      <p class="lede">A browser-based race engineering sandbox. Tune aero balance, fuel, tires and pit timing; watch the circuit telemetry react; then quantify whether the “faster” setup actually survives uncertainty.</p>
+    </div>
+    <div class="badge">5.2 km synthetic circuit · deterministic physics model · Monte Carlo strategy</div>
+  </header>
+
+  <div class="grid">
+    <aside class="panel controls">
+      <h2 class="section-title">Car setup</h2>
+      <div class="control"><div class="control-head"><label for="downforce">Downforce</label><output id="downforceOut"></output></div><input id="downforce" type="range" min="20" max="100" value="62"></div>
+      <div class="control"><div class="control-head"><label for="brakeBias">Brake bias</label><output id="brakeBiasOut"></output></div><input id="brakeBias" type="range" min="50" max="62" step=".1" value="56.4"></div>
+      <div class="control"><div class="control-head"><label for="fuel">Fuel load</label><output id="fuelOut"></output></div><input id="fuel" type="range" min="5" max="105" value="38"></div>
+      <div class="control"><div class="control-head"><label for="tireAge">Tire age</label><output id="tireAgeOut"></output></div><input id="tireAge" type="range" min="0" max="28" value="4"></div>
+      <div class="control"><label>Compound<select id="compound"><option value="soft">Soft</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></label></div>
+
+      <h2 class="section-title" style="margin-top:28px">Race strategy</h2>
+      <div class="control"><div class="control-head"><label for="pitLap">Pit lap</label><output id="pitLapOut"></output></div><input id="pitLap" type="range" min="5" max="24" value="14"></div>
+      <div class="control"><label>Second stint<select id="endCompound"><option value="soft">Soft</option><option value="medium">Medium</option><option value="hard" selected>Hard</option></select></label></div>
+      <button class="run" id="rerun">Re-run 500 simulations</button>
+      <p class="note">This is an engineering sandbox, not an FIA-validated vehicle model. The point is to make the tradeoffs measurable: drag vs cornering load, tire degradation vs grip, and mean pace vs strategy variance.</p>
+    </aside>
+
+    <section class="main">
+      <div class="panel hero">
+        <div class="track-wrap">
+          <canvas id="trackCanvas"></canvas>
+          <div class="legend">Circuit color = instantaneous speed · brighter = faster</div>
+        </div>
+        <div class="metrics">
+          <div class="metric wide"><span>Predicted lap</span><b id="lapTime">—</b><div id="lapDelta" class="delta">baseline</div></div>
+          <div class="metric"><span>Top speed</span><b id="maxSpeed">—</b></div>
+          <div class="metric"><span>Peak lateral</span><b id="peakG">—</b></div>
+          <div class="metric"><span>Avg speed</span><b id="avgSpeed">—</b></div>
+          <div class="metric"><span>Tire temp</span><b id="tireTemp">—</b></div>
+          <div class="metric wide"><span>Sector split</span><b id="sectors" style="font-size:20px">—</b></div>
+        </div>
+      </div>
+
+      <div class="charts">
+        <article class="panel chart-card"><h3>Speed trace</h3><p>Velocity around the lap. Slow troughs are high-curvature corners; the aero slider reshapes both corner and straight-line performance.</p><canvas id="speedChart"></canvas></article>
+        <article class="panel chart-card"><h3>Setup sensitivity</h3><p>One-dimensional response surface for downforce. The minimum is the model’s current aero optimum for this fuel/tire state.</p><canvas id="sweepChart"></canvas></article>
+      </div>
+
+      <div class="strategy">
+        <article class="panel strategy-card">
+          <h3 style="margin-top:0">Strategy uncertainty</h3>
+          <p style="color:#7f96a8;font-size:12px">500 races with driver noise, traffic variation, tire degradation and probabilistic Safety Car pit-loss reduction.</p>
+          <canvas id="histChart" style="width:100%;height:220px;background:#08131b;border-radius:14px"></canvas>
+        </article>
+        <article class="panel strategy-card">
+          <h3 style="margin-top:0">Race engineer readout</h3>
+          <div class="strategy-row">
+            <div class="mini"><span>Mean race time</span><strong id="mcMean">—</strong></div>
+            <div class="mini"><span>Std. deviation</span><strong id="mcSigma">—</strong></div>
+            <div class="mini"><span>P10</span><strong id="mcP10">—</strong></div>
+            <div class="mini"><span>P90</span><strong id="mcP90">—</strong></div>
+          </div>
+          <p class="note" id="strategyNote">—</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
